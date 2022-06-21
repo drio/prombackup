@@ -1,6 +1,7 @@
 # prombackup
 
-This is a webserver to trigger Prometheus snapshots and expose the status via metrics.
+A webserver to trigger and backup Prometheus snapshots and expose backup status for prometheus
+scrapping.
 
 The two endpoints are:
 
