@@ -86,7 +86,7 @@ func (app *App) RunSnapShot() {
 			BackupSize.Set(-1)
 			return
 		}
-		log.Println("tarball snapshot size:", snapSize)
+		log.Println("Tarball snapshot size:", snapSize)
 
 		err = app.UploadFile(tarBall)
 		if err != nil {

@@ -8,7 +8,7 @@ func main() {
 	app := &prombackup.App{
 		SnapUrl:     "http://localhost:9090",
 		SnapPath:    "api/v1/admin/tsdb/snapshot",
-		SnapDir:     "./data/snapshots",
+		SnapDir:     "./prometheus/data/snapshots",
 		TarBallName: "prom-snapshot.tar.gz",
 		ListenPort:  ":8080",
 		S3Region:    "us-east-1",

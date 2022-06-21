@@ -1,5 +1,5 @@
-start_prometheus:
-	prometheus --web.enable-admin-api
+run:
+	go run cmd/server.go
 
 snap:
-	@curl -s -X POST localhost:9090/api/v1/admin/tsdb/snapshot
+	@curl localhost:8080/snap
