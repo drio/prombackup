@@ -1,2 +1,5 @@
 data
 *.vim
+snap.tar.gz
+*.tar
+*.tar.gz
