@@ -9,14 +9,15 @@ import (
 )
 
 type App struct {
-	SnapUrl     string
-	SnapPath    string
-	SnapDir     string
-	TarBallName string
-	ListenPort  string // :port
-	S3Region    string
-	S3Bucket    string
-	S3ACL       string
+	SnapUrl       string
+	SnapPath      string
+	SnapDir       string
+	SecondsToZero int // After SecondsToZero set the metric back to zero bytes
+	TarBallName   string
+	ListenPort    string // :port
+	S3Region      string
+	S3Bucket      string
+	S3ACL         string
 }
 
 func (app *App) FullUrl() string {

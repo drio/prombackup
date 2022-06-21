@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"time"
 )
 
 type SnapResponse struct {
@@ -96,6 +97,12 @@ func (app *App) RunSnapShot() {
 		}
 		log.Println("Success uploading tarball to S3")
 		BackupSize.Set(float64(snapSize))
+
+		go func() {
+			time.Sleep(time.Duration(app.SecondsToZero) * time.Second)
+			log.Println("Setting backupsize metric back to zero")
+			BackupSize.Set(0)
+		}()
 
 		log.Printf("Snapshot pipeline completed: %s %d", snapName, snapSize)
 	}()
