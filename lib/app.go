@@ -9,18 +9,18 @@ import (
 )
 
 type App struct {
-	Url      string
-	SnapPath string
+	SnapUrl    string
+	SnapPath   string
+	ListenPort string // :port
 }
 
 func (app *App) FullUrl() string {
-	return (fmt.Sprintf("%s/%s", app.Url, app.SnapPath))
+	return (fmt.Sprintf("%s/%s", app.SnapUrl, app.SnapPath))
 }
 
 func (app *App) Run() {
 	http.HandleFunc("/backup", app.HandleSnapReq)
 	http.Handle("/metrics", promhttp.Handler())
-	port := ":8080"
-	log.Println("Listening on port", port)
-	log.Fatal(http.ListenAndServe(port, nil))
+	log.Println("Listening on port", app.ListenPort)
+	log.Fatal(http.ListenAndServe(app.ListenPort, nil))
 }

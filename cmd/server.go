@@ -6,8 +6,9 @@ import (
 
 func main() {
 	app := &prombackup.App{
-		Url:      "http://localhost:9090",
-		SnapPath: "api/v1/admin/tsdb/snapshot",
+		SnapUrl:    "http://localhost:9090",
+		SnapPath:   "api/v1/admin/tsdb/snapshot",
+		ListenPort: ":8080",
 	}
 
 	/*
