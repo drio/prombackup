@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"os/exec"
 )
 
 type SnapResponse struct {
@@ -35,40 +37,79 @@ func makeRequest(url string) ([]byte, error) {
 	return []byte(body), err
 }
 
-func (app *App) CreateSnapShot() (*string, error) {
+func (app *App) MakeTarBall(sourceDir string) (string, error) {
+	outputFile := app.TarBallName
+	log.Printf("Trying to make tarball %s on snap %s", outputFile, sourceDir)
+	_, err := exec.Command("tar", "-zcf", outputFile, sourceDir).CombinedOutput()
+	if err != nil {
+		return "", err
+	}
+	return outputFile, nil
+}
+
+func (app *App) CreateSnapShot() (string, error) {
 	body, err := makeRequest(app.FullUrl())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	var sr = new(SnapResponse)
 	err = json.Unmarshal(body, &sr)
 	if err != nil {
 		log.Println("Error unmarshalling Snap Response", err)
-		return nil, err
+		return "", err
 	}
 
-	return &sr.Data.Name, nil
+	return sr.Data.Name, nil
 }
 
-/*
-  At x time during the day:
-   - post to prometheus and get ID
-   - send directory to S3 or BB
-     * if ok:
-       - measure the directory size and update backupSize
-       - update metric to backpSize
-       - remove the snapshot directory
-     * else:
-       - update metric to -1
-   - After x minutes, update the metric value back to zero
-*/
 func (app *App) HandleSnapReq(w http.ResponseWriter, req *http.Request) {
-	pName, err := app.CreateSnapShot()
+	snapName, err := app.CreateSnapShot()
 	if err != nil {
-		w.WriteHeader(500)
-		fmt.Fprintf(w, "Could not create snapshot")
-	} else {
-		fmt.Fprintf(w, "ok: %s", *pName)
+		commonError("Error creating snapshot", w, err)
+		return
+	}
+	log.Println("Snap dir created:", snapName)
+
+	tarBall, err := app.MakeTarBall(fmt.Sprintf("%s/%s", app.SnapDir, snapName))
+	if err != nil {
+		commonError("Error making tarball", w, err)
+		BackupSize.Set(-1)
+		return
+	}
+	defer app.cleanUp()
+
+	snapSize, err := FileSize(tarBall)
+	if err != nil {
+		commonError("Error extracting tarball size", w, err)
+		BackupSize.Set(-1)
+		return
+	}
+	log.Println("tarball snapshot size:", snapSize)
+
+	err = app.UploadFile(tarBall)
+	if err != nil {
+		commonError("Could not upload tarbal to S3", w, err)
+		BackupSize.Set(-1)
+		return
+	}
+	log.Println("Success uploading tarball to S3")
+	BackupSize.Set(float64(snapSize))
+
+	fmt.Fprintf(w, "ok: %s %d", snapName, snapSize)
+}
+
+func (app *App) cleanUp() {
+	err := os.RemoveAll(app.SnapDir)
+	if err != nil {
+		log.Println("Error cleaning up SnapDir: ", err)
+	}
+
+	if _, err := os.Stat(app.TarBallName); err == nil {
+		// File exists
+		err = os.RemoveAll(app.TarBallName)
+		if err != nil {
+			log.Println("Error cleaning up Tarball: ", err)
+		}
 	}
 }

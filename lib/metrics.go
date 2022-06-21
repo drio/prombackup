@@ -5,13 +5,13 @@ import (
 )
 
 var (
-	backupSize = prometheus.NewGauge(prometheus.GaugeOpts{
+	BackupSize = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "prom_backup_size",
-		Help: "The size of the latest snapshot",
+		Help: "The size in bytes of the latest snapshot",
 	})
 )
 
 func init() {
-	prometheus.MustRegister(backupSize)
-	backupSize.Set(0.2)
+	prometheus.MustRegister(BackupSize)
+	BackupSize.Set(0)
 }

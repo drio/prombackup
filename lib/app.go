@@ -9,12 +9,14 @@ import (
 )
 
 type App struct {
-	SnapUrl    string
-	SnapPath   string
-	ListenPort string // :port
-	S3Region   string
-	S3Bucket   string
-	S3ACL      string
+	SnapUrl     string
+	SnapPath    string
+	SnapDir     string
+	TarBallName string
+	ListenPort  string // :port
+	S3Region    string
+	S3Bucket    string
+	S3ACL       string
 }
 
 func (app *App) FullUrl() string {
@@ -22,7 +24,7 @@ func (app *App) FullUrl() string {
 }
 
 func (app *App) Run() {
-	http.HandleFunc("/backup", app.HandleSnapReq)
+	http.HandleFunc("/snap", app.HandleSnapReq)
 	http.Handle("/metrics", promhttp.Handler())
 	log.Println("Listening on port", app.ListenPort)
 	log.Fatal(http.ListenAndServe(app.ListenPort, nil))
