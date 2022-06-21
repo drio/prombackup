@@ -1,4 +1,4 @@
-module github.com/drio/progo-backup
+module github.com/drio/prombackup
 
 go 1.18
 
