@@ -1,9 +1,6 @@
 package prombackup
 
 import (
-	"fmt"
-	"log"
-	"net/http"
 	"os"
 )
 
@@ -14,10 +11,4 @@ func FileSize(path string) (int64, error) {
 	}
 	size := fi.Size()
 	return size, nil
-}
-
-func commonError(msg string, w http.ResponseWriter, err error) {
-	w.WriteHeader(500)
-	fmt.Fprintf(w, "Could not create snapshot")
-	log.Println(msg, err)
 }

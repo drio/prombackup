@@ -24,7 +24,10 @@ func (app *App) FullUrl() string {
 }
 
 func (app *App) Run() {
-	http.HandleFunc("/snap", app.HandleSnapReq)
+	http.HandleFunc("/snap", func(w http.ResponseWriter, r *http.Request) {
+		go app.RunSnapShot()
+		fmt.Fprintf(w, "ok")
+	})
 	http.Handle("/metrics", promhttp.Handler())
 	log.Println("Listening on port", app.ListenPort)
 	log.Fatal(http.ListenAndServe(app.ListenPort, nil))
