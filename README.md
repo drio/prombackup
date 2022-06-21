@@ -1,12 +1,12 @@
 # progo-backup
 
-This is a tool to help you backup Prometheus data/snapshots. If you run into a failure in your 
-Prometheus server, you may end up losing your time series data. This is a go tool you can run 
-to:
+This is a webserver to trigger Prometheus snapshots and expose the status via metrics.
 
-  - Trigger prometheus [snapshots](https://prometheus.io/docs/prometheus/latest/querying/api/#snapshot) 
-    snapshots.
-  - Dump them into S3/Backblaze
-  - Expose prometheus metrics to monitor this process
+The two endpoints are:
 
+- `/metrics`: for prometheus scrapping
+- `/snap`: trigger a pipeline that will:
+  1. start a Prometheus snapshot
+  2. tarball the snapshot
+  3. upload it to S3
 
