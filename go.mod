@@ -2,12 +2,16 @@ module github.com/drio/prombackup
 
 go 1.18
 
-require github.com/prometheus/client_golang v1.12.2
+require (
+	github.com/aws/aws-sdk-go v1.44.38
+	github.com/prometheus/client_golang v1.12.2
+)
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect

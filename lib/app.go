@@ -12,6 +12,9 @@ type App struct {
 	SnapUrl    string
 	SnapPath   string
 	ListenPort string // :port
+	S3Region   string
+	S3Bucket   string
+	S3ACL      string
 }
 
 func (app *App) FullUrl() string {
