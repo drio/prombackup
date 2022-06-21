@@ -9,6 +9,6 @@ type App struct {
 	SnapPath string
 }
 
-func (a *App) FullUrl() string {
-	return (fmt.Sprintf("%s/%s", a.Url, a.SnapPath))
+func (app *App) FullUrl() string {
+	return (fmt.Sprintf("%s/%s", app.Url, app.SnapPath))
 }

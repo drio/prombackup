@@ -3,6 +3,7 @@ package prombackup
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -48,4 +49,26 @@ func (app *App) CreateSnapShot() (*string, error) {
 	}
 
 	return &sr.Data.Name, nil
+}
+
+/*
+  At x time during the day:
+   - post to prometheus and get ID
+   - send directory to S3 or BB
+     * if ok:
+       - measure the directory size and update backupSize
+       - update metric to backpSize
+       - remove the snapshot directory
+     * else:
+       - update metric to -1
+   - After x minutes, update the metric value back to zero
+*/
+func (app *App) HandleSnapReq(w http.ResponseWriter, req *http.Request) {
+	pName, err := app.CreateSnapShot()
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Fprintf(w, "Could not create snapshot")
+	} else {
+		fmt.Fprintf(w, "ok: %s", *pName)
+	}
 }
