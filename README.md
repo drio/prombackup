@@ -1,4 +1,4 @@
-# progo-backup
+# prombackup
 
 This is a webserver to trigger Prometheus snapshots and expose the status via metrics.
 
