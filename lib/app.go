@@ -25,8 +25,12 @@ func (app *App) FullUrl() string {
 
 func (app *App) Run() {
 	http.HandleFunc("/snap", func(w http.ResponseWriter, r *http.Request) {
-		go app.RunSnapShot()
-		fmt.Fprintf(w, "ok")
+		if runningSnapshot {
+			fmt.Fprintf(w, "I can't. Snapshot already in progress.")
+		} else {
+			fmt.Fprintf(w, "ok")
+			go app.RunSnapShot()
+		}
 	})
 	http.Handle("/metrics", promhttp.Handler())
 	log.Println("Listening on port", app.ListenPort)

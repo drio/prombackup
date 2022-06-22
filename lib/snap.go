@@ -21,6 +21,8 @@ type SnapData struct {
 	Name string `json:"name"`
 }
 
+var runningSnapshot = false
+
 func makeRequest(url string) ([]byte, error) {
 	res, err := http.Post(url, "application/json", bytes.NewBuffer([]byte("")))
 	if err != nil {
@@ -67,6 +69,8 @@ func (app *App) CreateSnapShot() (string, error) {
 
 func (app *App) RunSnapShot() {
 	func() {
+		runningSnapshot = true
+		defer app.cleanUp()
 		snapName, err := app.CreateSnapShot()
 		if err != nil {
 			log.Println("Error creating snapshot:", err)
@@ -80,7 +84,6 @@ func (app *App) RunSnapShot() {
 			BackupSize.Set(-1)
 			return
 		}
-		defer app.cleanUp()
 
 		snapSize, err := FileSize(tarBall)
 		if err != nil {
@@ -110,10 +113,15 @@ func (app *App) RunSnapShot() {
 }
 
 func (app *App) cleanUp() {
-	log.Println("Cleaning up snapdir: ", app.SnapDir)
-	err := os.RemoveAll(app.SnapDir)
-	if err != nil {
-		log.Println("Error cleaning up SnapDir:", err)
+	log.Println("Starting cleanup")
+	runningSnapshot = false
+
+	if _, err := os.Stat(app.SnapDir); err == nil {
+		log.Println("Cleaning up snapdir: ", app.SnapDir)
+		err := os.RemoveAll(app.SnapDir)
+		if err != nil {
+			log.Println("Error cleaning up SnapDir:", err)
+		}
 	}
 
 	if _, err := os.Stat(app.TarBallName); err == nil {
