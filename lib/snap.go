@@ -49,6 +49,7 @@ func (app *App) MakeTarBall(sourceDir string) (string, error) {
 }
 
 func (app *App) CreateSnapShot() (string, error) {
+	log.Println("Making snapshot request:", app.FullUrl())
 	body, err := makeRequest(app.FullUrl())
 	if err != nil {
 		return "", err
@@ -109,16 +110,18 @@ func (app *App) RunSnapShot() {
 }
 
 func (app *App) cleanUp() {
+	log.Println("Cleaning up snapdir: ", app.SnapDir)
 	err := os.RemoveAll(app.SnapDir)
 	if err != nil {
-		log.Println("Error cleaning up SnapDir: ", err)
+		log.Println("Error cleaning up SnapDir:", err)
 	}
 
 	if _, err := os.Stat(app.TarBallName); err == nil {
+		log.Println("Cleaning up tarball: ", app.TarBallName)
 		// File exists
 		err = os.RemoveAll(app.TarBallName)
 		if err != nil {
-			log.Println("Error cleaning up Tarball: ", err)
+			log.Println("Error cleaning up Tarball:", err)
 		}
 	}
 }
