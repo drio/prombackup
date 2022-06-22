@@ -26,14 +26,14 @@ var runningSnapshot = false
 func makeRequest(url string) ([]byte, error) {
 	res, err := http.Post(url, "application/json", bytes.NewBuffer([]byte("")))
 	if err != nil {
-		log.Println("Error making post request: ", err)
+		log.Println("Error making post request:", err)
 		return nil, err
 	}
 	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Println("Error reading returned post body: ", err)
+		log.Println("Error reading returned post body:", err)
 		return nil, err
 	}
 
@@ -131,7 +131,7 @@ func (app *App) cleanUp() {
 	runningSnapshot = false
 
 	if _, err := os.Stat(app.SnapDir); err == nil {
-		log.Println("Cleaning up snapdir: ", app.SnapDir)
+		log.Println("Cleaning up snapdir:", app.SnapDir)
 		err := os.RemoveAll(app.SnapDir)
 		if err != nil {
 			log.Println("Error cleaning up SnapDir:", err)
@@ -139,7 +139,7 @@ func (app *App) cleanUp() {
 	}
 
 	if _, err := os.Stat(app.TarBallName); err == nil {
-		log.Println("Cleaning up tarball: ", app.TarBallName)
+		log.Println("Cleaning up tarball:", app.TarBallName)
 		// File exists
 		err = os.RemoveAll(app.TarBallName)
 		if err != nil {
