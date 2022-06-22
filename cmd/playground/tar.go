@@ -1,23 +1,31 @@
-package prombackup
+package main
 
 import (
 	"archive/tar"
+	"bytes"
 	"compress/gzip"
 	"io"
 	"os"
 	"path/filepath"
 )
 
-func FileSize(path string) (int64, error) {
-	fi, err := os.Stat(path)
+func main() {
+	var buf bytes.Buffer
+	err := compress("prometheus/data/01G65HN0X6B0MFQ1GF80RVRFCM", &buf)
 	if err != nil {
-		return 0, err
+		panic(err)
 	}
-	size := fi.Size()
-	return size, nil
+
+	// write the .tar.gzip
+	fileToWrite, err := os.OpenFile("./compress.tar.gz", os.O_CREATE|os.O_RDWR, os.FileMode(0600))
+	if err != nil {
+		panic(err)
+	}
+	if _, err := io.Copy(fileToWrite, &buf); err != nil {
+		panic(err)
+	}
 }
 
-// Credit: https://gist.github.com/mimoo/25fc9716e0f1353791f5908f94d6e726
 func compress(src string, buf io.Writer) error {
 	// tar > gzip > buf
 	zr := gzip.NewWriter(buf)

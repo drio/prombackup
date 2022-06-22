@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"time"
 )
 
@@ -42,11 +42,25 @@ func makeRequest(url string) ([]byte, error) {
 
 func (app *App) MakeTarBall(sourceDir string) (string, error) {
 	outputFile := app.TarBallName
-	log.Printf("Trying to make tarball %s on snap %s", outputFile, sourceDir)
-	_, err := exec.Command("tar", "-zcf", outputFile, sourceDir).CombinedOutput()
+	log.Printf("Trying to make tarball %s on snapshot %s", outputFile, sourceDir)
+
+	// tar + gzip
+	var buf bytes.Buffer
+	err := compress(sourceDir, &buf)
 	if err != nil {
 		return "", err
 	}
+
+	// write the .tar.gz
+	fileToWrite, err := os.OpenFile(outputFile, os.O_CREATE|os.O_RDWR, os.FileMode(0600))
+	if err != nil {
+		return "", err
+	}
+
+	if _, err := io.Copy(fileToWrite, &buf); err != nil {
+		return "", err
+	}
+
 	return outputFile, nil
 }
 
