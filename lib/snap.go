@@ -86,6 +86,10 @@ func (app *App) RunSnapShot() {
 		runningSnapshot = true
 		defer app.cleanUp()
 		snapName, err := app.CreateSnapShot()
+		if snapName == "" {
+			log.Println("Snapname is empty", err)
+			return
+		}
 		if err != nil {
 			log.Println("Error creating snapshot:", err)
 			return
