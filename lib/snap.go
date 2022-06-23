@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
 type SnapResponse struct {
@@ -99,14 +98,12 @@ func (app *App) RunSnapShot() {
 		tarBall, err := app.MakeTarBall(fmt.Sprintf("%s/%s", app.SnapDir, snapName))
 		if err != nil {
 			log.Println("Error making tarball:", err)
-			BackupSize.Set(-1)
 			return
 		}
 
 		snapSize, err := FileSize(tarBall)
 		if err != nil {
 			log.Println("Error extracting tarball size:", err)
-			BackupSize.Set(-1)
 			return
 		}
 		log.Println("Tarball snapshot size:", snapSize)
@@ -114,17 +111,10 @@ func (app *App) RunSnapShot() {
 		err = app.UploadFile(tarBall)
 		if err != nil {
 			log.Println("Could not upload tarbal to S3: ", err)
-			BackupSize.Set(-1)
 			return
 		}
 		log.Println("Success uploading tarball to S3")
-		BackupSize.Set(float64(snapSize))
-
-		go func() {
-			time.Sleep(time.Duration(app.SecondsToZero) * time.Second)
-			log.Println("Setting backupsize metric back to zero")
-			BackupSize.Set(0)
-		}()
+		BackupSize.Add(float64(snapSize))
 
 		log.Printf("Snapshot pipeline completed: %s %d", snapName, snapSize)
 	}()
